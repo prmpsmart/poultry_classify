@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poultry_classify/constants.dart';
@@ -13,7 +12,7 @@ void main() {
   // await Hive.initFlutter();
 
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const ProviderScope(child: MainApp()));
+  runApp(const MainApp());
 }
 
 class MainApp extends StatefulWidget {
