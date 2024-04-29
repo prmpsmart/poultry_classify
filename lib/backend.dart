@@ -10,7 +10,7 @@ class ApiService {
   HttpClient httpClient = HttpClient()
     ..badCertificateCallback =
         ((X509Certificate cert, String host, int port) => true)
-    ..connectionTimeout = const Duration(seconds: 10);
+    ..connectionTimeout = const Duration(seconds: 60);
 
   Future<Map<String, dynamic>> post({
     required String url,
@@ -23,7 +23,8 @@ class ApiService {
     request.headers.set('Content-Type', 'application/json; charset=UTF-8');
     request.add(utf8.encode(jsonEncode(body)));
 
-    final response = await request.close().timeout(const Duration(seconds: 10));
+    final response =
+        await request.close().timeout(httpClient.connectionTimeout as Duration);
 
     final responseBody = await response.transform(utf8.decoder).join();
 

@@ -135,6 +135,7 @@ class _HomeState extends State<Home> {
                     ],
                   ),
                   Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       if (imageBytes.isEmpty)
                         Image.asset(
@@ -150,7 +151,25 @@ class _HomeState extends State<Home> {
                           ),
                           child: Image.memory(imageBytes),
                         ),
-                      20.verticalSpace,
+                      IconButton(
+                        onPressed: classify,
+                        icon: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.circle_outlined,
+                              color: primaryColor,
+                            ),
+                            10.horizontalSpace,
+                            const Text(
+                              'Reload',
+                              style: TextStyle(
+                                color: primaryColor,
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
                       Container(
                         height: 100.h,
                         width: 1.sw,
@@ -204,7 +223,6 @@ class _HomeState extends State<Home> {
                       MaterialButton(
                         onPressed: () async {
                           await pickImage(context, ImageSource.camera);
-                          print(imageBytes.length);
                         },
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(5.r),
