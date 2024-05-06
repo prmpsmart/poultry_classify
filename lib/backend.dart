@@ -4,8 +4,8 @@ import "dart:typed_data";
 import 'dart:io';
 
 class ApiService {
-  // static String host = "http://10.0.2.2:8000";
-  static String host = "https://holy-tightly-snail.ngrok-free.app";
+  static String host = "http://10.0.2.2:8000";
+  // static String host = "https://holy-tightly-snail.ngrok-free.app";
 
   HttpClient httpClient = HttpClient()
     ..badCertificateCallback =
@@ -48,7 +48,7 @@ class ApiService {
   }
 
   Future<Map<String, dynamic>> classify({required Uint8List image}) {
-    return post(url: 'classify', body: {
+    return post(url: 'classify2', body: {
       'image': base64Encode(image.toList()),
     });
   }

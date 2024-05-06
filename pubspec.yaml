@@ -16,6 +16,10 @@ dependencies:
   http: ^1.0.0
   async: ^2.11.0
   image_picker: ^1.0.8
+  permission_handler:
+  path_provider:
+  intl:
+  path:
 
 dev_dependencies:
   flutter_test:

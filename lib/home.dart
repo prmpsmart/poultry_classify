@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'dart:typed_data';
+import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -9,9 +10,14 @@ import 'package:poultry_classify/backend.dart';
 import 'package:poultry_classify/constants.dart';
 import 'package:poultry_classify/in_app_notification.dart';
 import 'package:poultry_classify/loader.dart';
+import 'package:poultry_classify/utils.dart';
+import 'package:intl/intl.dart';
+import 'package:path/path.dart' show join;
+import 'package:flutter/services.dart';
 
 class Home extends StatefulWidget {
-  const Home({super.key});
+  final String email;
+  const Home(this.email, {super.key});
 
   @override
   State<Home> createState() => _HomeState();
@@ -20,6 +26,37 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final imagePicker = ImagePicker();
   Uint8List imageBytes = Uint8List(0);
+
+  @override
+  initState() {
+    super.initState();
+
+    Future.delayed(
+      const Duration(seconds: 2),
+      getExternalDocumentPath,
+    );
+  }
+
+  Future<String> get _localPath async {
+    final String directory = await getExternalDocumentPath();
+    return directory;
+  }
+
+  Future<void> writeToFile(String disease) async {
+    DateTime now = DateTime.now();
+    String formattedDateTime = DateFormat('yyyy-MM-dd_HH-mm-ss').format(now);
+    final fileName = '$disease-$formattedDateTime.png';
+
+    String filePath = join(await _localPath, fileName);
+    File file = File(filePath);
+
+    try {
+      await file.writeAsBytes(imageBytes, flush: true);
+      InAppNotification.show(context, 'Image saved to: $filePath');
+    } catch (e) {
+      InAppNotification.show(context, 'Error saving image: $e', isError: true);
+    }
+  }
 
   pickImage(BuildContext context, ImageSource imageSource) async {
     imageBytes = Uint8List(0);
@@ -54,8 +91,19 @@ class _HomeState extends State<Home> {
         data['detail'],
         isError: !success,
       );
+      final disease = data['disease'];
+      final diseaseImage = data['disease_image'];
+
+      if (disease != null) {
+        result = disease;
+      }
+
+      if (diseaseImage != null) {
+        imageBytes = base64Decode(diseaseImage);
+      }
+
       setState(() {
-        result = data['disease'];
+        writeToFile(disease);
       });
     } catch (e) {
       InAppNotification.show(
@@ -108,7 +156,7 @@ class _HomeState extends State<Home> {
                                 ),
                               ),
                               Text(
-                                ' prmpsmart@gmail.com',
+                                ' ${widget.email}',
                                 style: TextStyle(
                                   color: primaryColor,
                                   fontWeight: FontWeight.bold,
@@ -151,28 +199,13 @@ class _HomeState extends State<Home> {
                           ),
                           child: Image.memory(imageBytes),
                         ),
-                      IconButton(
-                        onPressed: classify,
-                        icon: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.circle_outlined,
-                              color: primaryColor,
-                            ),
-                            10.horizontalSpace,
-                            const Text(
-                              'Reload',
-                              style: TextStyle(
-                                color: primaryColor,
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
                       Container(
-                        height: 100.h,
+                        height: 70.h,
                         width: 1.sw,
+                        margin: EdgeInsets.symmetric(
+                          vertical: 20.h,
+                          horizontal: 10.w,
+                        ),
                         decoration: BoxDecoration(
                           color: primaryColor,
                           borderRadius: BorderRadius.circular(10.r),
@@ -187,6 +220,50 @@ class _HomeState extends State<Home> {
                                 fontWeight: FontWeight.bold),
                           ),
                         ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          IconButton(
+                            onPressed: classify,
+                            icon: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.circle_outlined,
+                                  color: primaryColor,
+                                ),
+                                10.horizontalSpace,
+                                const Text(
+                                  'Reload',
+                                  style: TextStyle(
+                                    color: primaryColor,
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () =>
+                                Navigator.pushNamed(context, 'history'),
+                            icon: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.circle_outlined,
+                                  color: Colors.green,
+                                ),
+                                10.horizontalSpace,
+                                const Text(
+                                  'History',
+                                  style: TextStyle(
+                                    color: Colors.green,
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:poultry_classify/backend.dart';
@@ -16,12 +17,22 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  final emailCont = TextEditingController(text: 'prmpsmart@gmail.com');
-  final passwordCont = TextEditingController(text: 'prmpsmart');
+  final emailCont = TextEditingController();
+  final passwordCont = TextEditingController();
 
   final api = ApiService();
 
   bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (kDebugMode) {
+      emailCont.text = 'prmpsmart@gmail.com';
+      passwordCont.text = 'prmpsmart';
+    }
+  }
 
   login(bool isNew) async {
     if (emailCont.text.isNotEmpty && passwordCont.text.isNotEmpty) {
@@ -40,7 +51,12 @@ class _LoginState extends State<Login> {
           data['detail'],
           isError: !success,
         );
-        if (success) Navigator.of(context).pushNamed('home');
+        if (success) {
+          Navigator.of(context).pushNamed(
+            'home',
+            arguments: emailCont.text,
+          );
+        }
       } catch (e) {
         InAppNotification.show(
           context,

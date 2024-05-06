@@ -35,7 +35,7 @@ class _MainAppState extends State<MainApp> {
       splitScreenMode: true,
       builder: (context, _) {
         return  MaterialApp(
-          title: 'Zepama',
+          title: 'PoultryDisease',
           debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
