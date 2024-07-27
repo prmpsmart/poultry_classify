@@ -106,54 +106,58 @@ class _HistoryState extends State<History> {
                 SizedBox(
                   height: .87.sh,
                   width: 1.sw - 40.w,
-                  child: Expanded(
-                    child: ListView.builder(
-                      itemCount: diseases.length,
-                      itemBuilder: (context, index) {
-                        final disease = diseases[index];
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: diseases.length,
+                          itemBuilder: (context, index) {
+                            final disease = diseases[index];
 
-                        return Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10.r),
-                          ),
-                          margin: EdgeInsets.only(bottom: 10.h),
-                          clipBehavior: Clip.hardEdge,
-                          child: Column(
-                            children: [
-                              Image.file(
-                                disease.image,
-                                fit: BoxFit.contain,
+                            return Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10.r),
                               ),
-                              Container(
-                                width: 1.sw,
-                                padding: EdgeInsets.zero,
-                                color: primaryColor,
-                                child: Column(
-                                  children: [
-                                    Text(
-                                      disease.name,
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 20.spMin,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                              margin: EdgeInsets.only(bottom: 10.h),
+                              clipBehavior: Clip.hardEdge,
+                              child: Column(
+                                children: [
+                                  Image.file(
+                                    disease.image,
+                                    fit: BoxFit.contain,
+                                  ),
+                                  Container(
+                                    width: 1.sw,
+                                    padding: EdgeInsets.zero,
+                                    color: primaryColor,
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          disease.name,
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 20.spMin,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Text(
+                                          disease.datetime,
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 20.spMin,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    Text(
-                                      disease.datetime,
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 20.spMin,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            ],
-                          ),
-                        );
-                      },
-                    ),
+                                  )
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 )
               ],

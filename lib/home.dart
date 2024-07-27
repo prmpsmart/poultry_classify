@@ -26,6 +26,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final imagePicker = ImagePicker();
   Uint8List imageBytes = Uint8List(0);
+  Uint8List _imageBytes = Uint8List(0);
 
   @override
   initState() {
@@ -66,7 +67,7 @@ class _HomeState extends State<Home> {
         await imagePicker.pickImage(source: imageSource, imageQuality: 50);
 
     if (image != null) {
-      imageBytes = await image.readAsBytes();
+      _imageBytes = await image.readAsBytes();
       classify();
     }
   }
@@ -76,14 +77,33 @@ class _HomeState extends State<Home> {
   bool isLoading = false;
 
   String result = "Result will be displayed here...";
+  String recom = "";
+
+  Map recommendations = {
+    "healthy": "Continue standard care",
+    "coccidiosis":
+        "Administer anti-coccidial medications e.g Amprolium (Amprol, Corid) OR Decoquinate (Deccox)",
+    "newcastle disease": "Isolate and vaccinate (B1 Type, LaSota Strain)",
+    "salmonella":
+        "Administer Salmonella medications (Add enrofloxacin to drinking water)",
+    "unhealthy": "Investigate further, consult a veterinarian",
+  };
 
   classify() async {
+    if (_imageBytes.isEmpty) {
+      InAppNotification.show(
+        context,
+        'Select an image first',
+        isError: true,
+      );
+      return;
+    }
     setState(() {
       isLoading = true;
     });
     try {
       final data = await api.classify(
-        image: imageBytes,
+        image: _imageBytes,
       );
       final success = data['status'] == 200;
       InAppNotification.show(
@@ -91,12 +111,11 @@ class _HomeState extends State<Home> {
         data['detail'],
         isError: !success,
       );
-      final disease = data['disease'];
+      String disease = data['disease'] ?? 'healthy';
       final diseaseImage = data['disease_image'];
 
-      if (disease != null) {
-        result = disease;
-      }
+      result = disease;
+      recom = recommendations[disease.toLowerCase()] ?? '';
 
       if (diseaseImage != null) {
         imageBytes = base64Decode(diseaseImage);
@@ -119,6 +138,8 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    final imageBytes = this.imageBytes.isEmpty ? _imageBytes : this.imageBytes;
+
     return LoadingOverlay(
       isLoading: isLoading,
       child: Scaffold(
@@ -197,28 +218,81 @@ class _HomeState extends State<Home> {
                             color: primaryColor,
                             borderRadius: BorderRadius.circular(10.r),
                           ),
-                          child: Image.memory(imageBytes),
+                          child: Image.memory(
+                            imageBytes,
+                            width: 1.sw - 40.w,
+                            height: .5.sh,
+                          ),
                         ),
+                      10.verticalSpace,
                       Container(
-                        height: 70.h,
                         width: 1.sw,
-                        margin: EdgeInsets.symmetric(
-                          vertical: 20.h,
+                        padding: EdgeInsets.symmetric(
+                          vertical: 5.h,
                           horizontal: 10.w,
                         ),
                         decoration: BoxDecoration(
                           color: primaryColor,
                           borderRadius: BorderRadius.circular(10.r),
                         ),
-                        child: Center(
-                          child: Text(
-                            result,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Status : ',
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 25.spMin,
-                                fontWeight: FontWeight.bold),
-                          ),
+                                fontSize: 15.spMin,
+                              ),
+                            ),
+                            Center(
+                              child: Text(
+                                result,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 19.spMin,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      10.verticalSpace,
+                      Container(
+                        // height: 30.h,
+                        width: 1.sw,
+                        padding: EdgeInsets.symmetric(
+                          vertical: 5.h,
+                          horizontal: 10.w,
+                        ),
+                        decoration: BoxDecoration(
+                          color: primaryColor,
+                          borderRadius: BorderRadius.circular(10.r),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Recommendation : ',
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 15.spMin,
+                              ),
+                            ),
+                            Center(
+                              child: Text(
+                                recom,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 19.spMin,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       Row(

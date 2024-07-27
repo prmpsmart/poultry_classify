@@ -5,7 +5,9 @@ import 'dart:io';
 
 class ApiService {
   // static String host = "http://10.0.2.2:8000";
-  static String host = "https://holy-tightly-snail.ngrok-free.app";
+  // static String host = "http://192.168.170.236:8000";
+  // static String host = "https://holy-tightly-snail.ngrok-free.app";
+  static String host = "https://unbiased-precisely-bass.ngrok-free.app";
 
   HttpClient httpClient = HttpClient()
     ..badCertificateCallback =
@@ -20,7 +22,9 @@ class ApiService {
 
     final request = await httpClient.postUrl(apiUrl);
 
+    request.headers.set('ngrok-skip-browser-warning', 'true');
     request.headers.set('Content-Type', 'application/json; charset=UTF-8');
+
     request.add(utf8.encode(jsonEncode(body)));
 
     final response =
